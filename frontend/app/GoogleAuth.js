@@ -1,7 +1,8 @@
 "use client"
 
 import React from 'react';
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 import 'firebase/auth';
 
 const firebaseConfig = {
