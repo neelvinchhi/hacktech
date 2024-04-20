@@ -1,0 +1,29 @@
+{
+  "name": "hacktech",
+  "version": "1.0.0",
+  "description": "a community for people with mental health illness",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neelvinchhi/hacktech.git"
+  },
+  "author": "shamant",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neelvinchhi/hacktech/issues"
+  },
+  "homepage": "https://github.com/neelvinchhi/hacktech#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "express": "^4.19.2",
+    "firebase": "^10.11.0",
+    "firebase-admin": "^12.1.0",
+    "nodemailer": "^6.9.13"
+  }
+}
