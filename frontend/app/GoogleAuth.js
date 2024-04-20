@@ -26,7 +26,7 @@ const GoogleAuth = () => {
   const handleSignInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
       const name = user.email.replace('@gmail.com', '');
