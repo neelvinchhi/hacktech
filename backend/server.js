@@ -3,15 +3,16 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
-const serviceAccount = require('./path/to/serviceAccountKey.json'); 
+const serviceAccount = require('./serviceAccountKey.json');
+
 const firebaseConfig = {
-    apiKey: "AIzaSyCz0uAMDnDk7T0v9BYV6ueIwp8zJGn0f10",
-    authDomain: "psysync-6e2aa.firebaseapp.com",
-    projectId: "psysync-6e2aa",
-    storageBucket: "psysync-6e2aa.appspot.com",
-    messagingSenderId: "186386703961",
-    appId: "1:186386703961:web:59b7808ab3e53258bf3348",
-    measurementId: "G-0RRF2PHJC2"
+  apiKey: "AIzaSyCz0uAMDnDk7T0v9BYV6ueIwp8zJGn0f10",
+  authDomain: "psysync-6e2aa.firebaseapp.com",
+  projectId: "psysync-6e2aa",
+  storageBucket: "psysync-6e2aa.appspot.com",
+  messagingSenderId: "186386703961",
+  appId: "1:186386703961:web:59b7808ab3e53258bf3348",
+  measurementId: "G-0RRF2PHJC2"
 };
 
 admin.initializeApp({
@@ -24,7 +25,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = admin.firestore();
+const db = admin.firestore(); 
+
 
 app.post('/signup/google', async (req, res) => {
   try {
@@ -75,39 +77,30 @@ app.post('/responses', async (req, res) => {
     try {
       const responseList = req.body.response;
       const email = req.body.email;
-      const nodeRef = admin.database().ref('response');
-  
-      nodeRef.orderByChild('email').equalTo(email).once('value')
-        .then((snapshot) => {
-          snapshot.forEach((childSnapshot) => {
-            const key = childSnapshot.key;
-  
-            nodeRef.child(key).update({
-              'response': responseList,
-            })
-            .then(() => {
-              console.log('Data updated successfully');
-            })
-            .catch((error) => {
-              console.error('Error updating data:', error);
-            });
-          });
-        })
-        .catch((error) => {
-          console.error('Error querying data:', error);
-          res.status(500).send('Error updating responses');
+
+      const userRef = db.collection('users').where('email', '==', email).limit(1);
+      const snapshot = await userRef.get();
+      
+      if (snapshot.empty) {
+        console.log('No matching documents.');
+        return res.status(404).send('User not found');
+      }
+
+      snapshot.forEach(async (doc) => {
+        await db.collection('users').doc(doc.id).update({
+          response: responseList
         });
-  
+      });
+
       console.log('Responses updated successfully');
       res.status(200).send('Responses updated successfully');
     } catch (error) {
       console.error('Error updating responses:', error.message);
       res.status(500).send('Error updating responses');
     }
-  });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
