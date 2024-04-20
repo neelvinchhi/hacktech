@@ -7,7 +7,8 @@ const preview = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const q = query(collection(db, 'users'), where('name', '==', 'someone'));
+        const name = localStorage.getItem("username");
+        const q = query(collection(db, 'users'), where('name', '==', name));
         const querySnapshot = await getDocs(q);
 
         const communityNames = [];
