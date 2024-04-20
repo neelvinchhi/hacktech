@@ -2,13 +2,13 @@ import { getFirestore, collection, query, where, getDocs, limit } from 'firebase
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyCz0uAMDnDk7T0v9BYV6ueIwp8zJGn0f10",
+  authDomain: "psysync-6e2aa.firebaseapp.com",
+  projectId: "psysync-6e2aa",
+  storageBucket: "psysync-6e2aa.appspot.com",
+  messagingSenderId: "186386703961",
+  appId: "1:186386703961:web:59b7808ab3e53258bf3348",
+  measurementId: "G-0RRF2PHJC2"
 };
 
 const app = initializeApp(firebaseConfig);
