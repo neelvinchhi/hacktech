@@ -4,7 +4,7 @@ import { React, useState } from 'react';
 import * as firebase from 'firebase/app';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-
+import { getFirestore, collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
 
 
 const firebaseConfig = {
@@ -27,8 +27,24 @@ const GoogleAuth = () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      console.log('Signed in successfully!');
-      // Add any additional logic after successful sign-in
+      const user = result.user;
+
+      const name = user.email.replace('@gmail.com', '');
+
+      const q = query(collection(db, 'users'), where('email', '==', user.email));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          name: name,
+          response: ''
+        });
+
+        localStorage.setItem('username', name);
+
+        console.log('User added to Firestore:', user.uid);
+      }
     } catch (error) {
       console.error('Error signing in with Google:', error.message);
       setError('Error signing in with Google. Please try again.');
