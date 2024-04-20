@@ -1,7 +1,7 @@
 "use client"
 
 import { React, useState } from 'react';
-import { Box, Heading, Button, Text } from '@chakra-ui/react'
+import { Box, Heading, Button, Text, ChakraProvider } from '@chakra-ui/react'
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
@@ -50,7 +50,7 @@ const GoogleAuth = () => {
       }
 
       // Redirect to dashboard upon successful authentication
-      router.push('/dashboard');
+      router.push('/quiz');
     } catch (error) {
       console.error('Error signing in with Google:', error.message);
       setError('Error signing in with Google. Please try again.');
