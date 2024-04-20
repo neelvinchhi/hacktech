@@ -1,9 +1,17 @@
+"use client"
+
 import React from 'react';
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
 import 'firebase/auth';
 
 const firebaseConfig = {
-  // Your Firebase config here
+  apiKey: "AIzaSyCz0uAMDnDk7T0v9BYV6ueIwp8zJGn0f10",
+  authDomain: "psysync-6e2aa.firebaseapp.com",
+  projectId: "psysync-6e2aa",
+  storageBucket: "psysync-6e2aa.appspot.com",
+  messagingSenderId: "186386703961",
+  appId: "1:186386703961:web:59b7808ab3e53258bf3348",
+  measurementId: "G-0RRF2PHJC2"
 };
 
 // Initialize Firebase

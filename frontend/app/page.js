@@ -1,7 +1,15 @@
-import { Heading } from '@chakra-ui/react';
+import React from 'react';
+import GoogleAuth from './GoogleAuth';
+import Chatroom from './Chatroom';
+import { Chat } from 'openai/resources/beta/chat/chat';
+import { ChakraProvider } from '@chakra-ui/react'
 
 export default function Home() {
   return (
-    <Heading>Hello World</Heading>
+    <ChakraProvider>
+      <GoogleAuth/>
+      <Chatroom/>
+    </ChakraProvider>
   );
 }
+
