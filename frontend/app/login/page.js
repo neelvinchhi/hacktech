@@ -1,10 +1,12 @@
 "use client"
 
 import { React, useState } from 'react';
-import * as firebase from 'firebase/app';
+import { Box, Heading, Button, Text } from '@chakra-ui/react'
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
+import { useRouter } from 'next/router';
+
 
 
 const firebaseConfig = {
@@ -23,6 +25,12 @@ const db = getFirestore(app);
 
 const GoogleAuth = () => {
   const [error, setError] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // This code will execute after component mount
+    router.prefetch('/dashboard'); // Prefetch the dashboard page for faster navigation
+  }, [router]);
 
   const handleSignInWithGoogle = async () => {
     try {
@@ -43,9 +51,11 @@ const GoogleAuth = () => {
         });
 
         localStorage.setItem('username', name);
-
         console.log('User added to Firestore:', user.uid);
       }
+
+      // Redirect to dashboard upon successful authentication
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error signing in with Google:', error.message);
       setError('Error signing in with Google. Please try again.');
@@ -53,11 +63,12 @@ const GoogleAuth = () => {
   };
 
   return (
-    <div>
-      <h1>Firebase Authentication Demo</h1>
-      <button onClick={handleSignInWithGoogle}>Sign In with Google</button>
-      {error && <p>{error}</p>}
-    </div>
+    <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+      <Heading m='10px'> Welcome to Pysync</Heading>
+      <Text m='10px'>Lorem ipsum dolrosdlkdsngljfbgkeudvnkudfbk</Text>
+      <Button onClick={handleSignInWithGoogle} m='10px'>Continue with Google</Button>
+      {/* {error && <p>{error}</p>} */}
+    </Box>
   );
 };
 

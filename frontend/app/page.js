@@ -1,14 +1,14 @@
+'use client'
+
 import React from 'react';
-import GoogleAuth from './GoogleAuth';
-import Chatroom from './Chatroom';
-import { Chat } from 'openai/resources/beta/chat/chat';
-import { ChakraProvider } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+import { ChakraProvider, Heading } from '@chakra-ui/react'
 
 export default function Home() {
+
   return (
     <ChakraProvider>
-      <GoogleAuth/>
-      <Chatroom/>
+      <Heading>Hello </Heading>
     </ChakraProvider>
   );
 }
