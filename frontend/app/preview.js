@@ -44,7 +44,7 @@ const [response, setResponse] = useState([]);
       {/* Display community names as links */}
       {response.map((community, index) => (
         <div key={index}>
-          <a href={`/${community}`} target="_blank">{community}</a>
+          <a href={`/chat?=${community}`} target="_blank">{community}</a>
         </div>
       ))}
     </div>
