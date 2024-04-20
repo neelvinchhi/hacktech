@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { app, db } from './config';
+import { db, collection, query, where, getDocs, setDoc, doc, limit } from './config';
 
-const preview = () => {
-  const [communities, setCommunities] = useState([]);
+const Preview = () => {
+const [response, setResponse] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const name = localStorage.getItem("username");
-        const q = query(collection(db, 'users'), where('name', '==', name));
+        const q = query(collection(db, 'users'));
         const querySnapshot = await getDocs(q);
 
-        const communityNames = [];
+        let communities = [];
         querySnapshot.forEach((doc) => {
-          communityNames.push(doc.data().community);
+          communities = doc.data().response || []; // Assuming 'response' contains the array of communities
         });
         
-        setCommunities(communityNames);
+        setResponse(communities);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -25,10 +24,25 @@ const preview = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    response.forEach(async (community) => {
+      const messageQuery = query(collection(db, 'messages'), where('community', '==', community), limit(1));
+      const messageSnapshot = await getDocs(messageQuery);
+      
+      if (messageSnapshot.empty) {
+        await setDoc(doc(db, 'messages'), {
+          name: 'AI Bot',
+          message: `Hello there! Welcome to the ${community} community. Please feel free to be open and converse with the people and me.`,
+          community: community
+        });
+      }
+    });
+  }, [response]);
+
   return (
     <div>
       {/* Display community names as links */}
-      {communities.map((community, index) => (
+      {response.map((community, index) => (
         <div key={index}>
           <a href={`/${community}`} target="_blank">{community}</a>
         </div>
@@ -37,4 +51,4 @@ const preview = () => {
   );
 };
 
-export default preview;
+export default Preview;
