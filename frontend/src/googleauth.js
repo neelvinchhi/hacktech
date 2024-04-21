@@ -59,12 +59,10 @@ const GoogleAuth = () => {
 
   return (
     <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-      <Heading m='10px'> Welcome to Pysync</Heading>
-      <Text m='10px'>Lorem ipsum dolrosdlkdsngljfbgkeudvnkudfbk</Text>
+      <Heading m='10px'> Welcome to Highway</Heading>
+      <Text m='10px'></Text>
       <Button onClick={handleSignInWithGoogle} m='10px'>
-        {localStorage.getItem("username") ? (
-          <Link to='/quiz'>Continue withdssdfsdfsdfsds Google</Link>
-          ) : null}
+          <Link to='/quiz'>Continue with Google</Link>
       </Button>
 
     </Box>

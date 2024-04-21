@@ -18,7 +18,8 @@ const Preview = () => {
         querySnapshot.forEach((doc) => {
           const responseData = doc.data().response || '';
           const formattedResponse = responseData.replace('[', '').replace(']', '').replace(/'/g, '');
-          userCommunities = formattedResponse.split(',').map((community) => community.trim());
+          const communities = formattedResponse.split(',').map((community) => community.trim());
+          userCommunities = [...userCommunities, ...communities];
         });
 
         setCommunities(userCommunities);
@@ -62,7 +63,7 @@ const Preview = () => {
 
   return (
     <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-      <Heading m='5'>Welcome to APEX</Heading>
+      <Heading m='5'>Join your Highway community!</Heading>
       {communities.map((community, index) => (
         <Box key={index}>
           <Link to={`/chat?room=${community}`}>
