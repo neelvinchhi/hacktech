@@ -1,28 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { db, collection, query, where, getDocs, setDoc, doc, limit } from './config';
+import { db } from './config';
+import { collection, query, where, getDocs, setDoc, doc, limit } from 'firebase/firestore';
 
 const Preview = () => {
-const [response, setResponse] = useState([]);
+  const username = localStorage.getItem('username');
+  const [response, setResponse] = useState([]);
+  const [noCommunities, setNoCommunities] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const q = query(collection(db, 'users'));
+        const q = query(collection(db, 'users'), where('username', '==', username));
         const querySnapshot = await getDocs(q);
 
         let communities = [];
         querySnapshot.forEach((doc) => {
-          communities = doc.data().response || []; // Assuming 'response' contains the array of communities
+          communities = doc.data().response || [];
         });
         
         setResponse(communities);
+
+        if (communities.length === 0) {
+          setNoCommunities(true);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     response.forEach(async (community) => {
@@ -38,6 +45,10 @@ const [response, setResponse] = useState([]);
       }
     });
   }, [response]);
+
+  if (noCommunities) {
+    return <div>Sorry, you are not part of any group yet.</div>;
+  }
 
   return (
     <div>
