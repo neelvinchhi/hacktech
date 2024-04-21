@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Select, Button, Box, Text } from '@chakra-ui/react';
 import { db } from './config';
-import { collection, doc, setDoc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, updateDoc, arrayUnion, getDocs, query, where } from 'firebase/firestore';
 
 function QuizComponent() {
 
@@ -557,27 +557,31 @@ function QuizComponent() {
       }
     });
 
-    if (totalScore > 18) {
+    if (parseInt(totalScore) > 18) {
       // User may have the disorder
       const newDisorder = selectedIssue;
+      console.log(totalScore)
       try {
-        const userRef = doc(db, 'users', localStorage.getItem('username'));
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          const responseData = docSnap.data().response;
-          let responseArray = responseData ? JSON.parse(responseData) : [];
-          responseArray.push(newDisorder);
-          const updatedResponse = JSON.stringify(responseArray);
-          await updateDoc(userRef, {
-            response: updatedResponse
-          });
-          console.log(`Disorder ${newDisorder} added to user's response.`);
+        const name = localStorage.getItem('username');
+
+        if (!name) {
+          console.error('Username not found in localStorage');
+          return;
+        }
+
+        const q = query(collection(db, 'users'), where('name', '==', name));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const responseData = userDoc.data().response;
+          const responseArray = responseData ? JSON.parse(responseData) : [];
           setUserDisorders(responseArray);
         } else {
-          console.log('User document does not exist.');
+          console.log('No user found with the name:', name);
         }
       } catch (error) {
-        console.error('Error updating document:', error);
+        console.error('Error fetching user data:', error);
       }
     } else {
       // User doesn't have any disorders

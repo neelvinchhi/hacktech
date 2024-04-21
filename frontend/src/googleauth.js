@@ -5,6 +5,7 @@ import { Box, Heading, Button, Text, ChakraProvider } from '@chakra-ui/react'
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
+import { Link} from 'react-router-dom';
 
 
 
@@ -45,12 +46,14 @@ const GoogleAuth = () => {
 
         localStorage.setItem('username', name);
         console.log('User added to Firestore:', user.uid);
+        
       }
 
 
     } catch (error) {
       console.error('Error signing in with Google:', error.message);
       setError('Error signing in with Google. Please try again.');
+
     }
   };
 
@@ -58,7 +61,12 @@ const GoogleAuth = () => {
     <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
       <Heading m='10px'> Welcome to Pysync</Heading>
       <Text m='10px'>Lorem ipsum dolrosdlkdsngljfbgkeudvnkudfbk</Text>
-      <Button onClick={handleSignInWithGoogle} m='10px'>Continue with Google</Button>
+      <Button onClick={handleSignInWithGoogle} m='10px'>
+        {localStorage.getItem("username") ? (
+          <Link to='/quiz'>Continue withdssdfsdfsdfsds Google</Link>
+          ) : null}
+      </Button>
+
     </Box>
   );
 };

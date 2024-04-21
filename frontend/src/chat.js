@@ -26,7 +26,7 @@ const Chat = () => {
   const name = localStorage.getItem("username");
   const messagesEndRef = useRef(null);
   const openai = new OpenAI({apiKey : "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", dangerouslyAllowBrowser:true});
-
+  const [result, setResult] = useState('');
 
   async function main(newMessage) {
     const completion = await openai.chat.completions.create({
@@ -95,6 +95,26 @@ const Chat = () => {
     if (!newMessage.trim()) return;
 
     try {
+
+       const fetchData = async () => {
+       const url = 'https://6b44-34-16-144-130.ngrok-free.app/feeling_pred';
+       const input_data_for_model = {
+      'StringInput': newMessage
+       };
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(input_data_for_model)
+          });
+          const data = await response.text();
+          setResult(data);
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
       var words = newMessage.split(" ")
       if (words.length > 0 && words[0].toUpperCase() === 'RAJU') {
         main(newMessage.trim());
