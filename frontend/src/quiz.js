@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Select, Button, Box, Text } from '@chakra-ui/react';
 import { db } from './config';
 import { collection, doc, setDoc, updateDoc, arrayUnion, getDocs, query, where } from 'firebase/firestore';
+import { Link } from 'react-router-dom';
 
 function QuizComponent() {
 
@@ -545,51 +546,66 @@ function QuizComponent() {
   };
 
   const calculateQuizScore = async () => {
-    let totalScore = 0;
+  let totalScore = 0;
 
-    quizBank.forEach((issue) => {
-      if (issue.issue === selectedIssue) {
-        issue.questions.forEach((question) => {
-          const userAnswer = answers[question.id];
-          const answerIndex = question.options.indexOf(userAnswer);
-          totalScore += answerIndex;
-        });
-      }
-    });
-
-    if (parseInt(totalScore) > 18) {
-      // User may have the disorder
-      const newDisorder = selectedIssue;
-      console.log(totalScore)
-      try {
-        const name = localStorage.getItem('username');
-
-        if (!name) {
-          console.error('Username not found in localStorage');
-          return;
-        }
-
-        const q = query(collection(db, 'users'), where('name', '==', name));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const userDoc = querySnapshot.docs[0];
-          const responseData = userDoc.data().response;
-          const responseArray = responseData ? JSON.parse(responseData) : [];
-          setUserDisorders(responseArray);
-        } else {
-          console.log('No user found with the name:', name);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    } else {
-      // User doesn't have any disorders
-      console.log('You do not have any disorders.');
+  quizBank.forEach((issue) => {
+    if (issue.issue === selectedIssue) {
+      issue.questions.forEach((question) => {
+        const userAnswer = answers[question.id];
+        const answerIndex = question.options.indexOf(userAnswer);
+        totalScore += answerIndex;
+      });
     }
+  });
 
-    setQuizCompleted(true);
-  };
+  if (parseInt(totalScore) > 18) {
+    // User may have the disorder
+    const newDisorder = selectedIssue;
+    console.log(totalScore)
+    try {
+      const name = localStorage.getItem('username');
+
+      if (!name) {
+        console.error('Username not found in localStorage');
+        return;
+      }
+
+      const q = query(collection(db, 'users'), where('name', '==', name));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const responseData = userDoc.data().response;
+        const responseArray = responseData ? JSON.parse(responseData) : [];
+
+        // Check if the new disorder is already in the user's response array
+        if (!responseArray.includes(newDisorder)) {
+          // Add the new disorder to the user's response array
+          responseArray.push(newDisorder);
+
+          // Update the user's response data in Firestore
+          const updatedResponse = JSON.stringify(responseArray);
+          await updateDoc(userDoc.ref, {
+            response: updatedResponse
+          });
+
+          console.log("Disorder " + newDisorder +  " added to user's response.");
+        }
+
+        setUserDisorders(responseArray);
+      } else {
+        console.log('No user found with the name:', name);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  } else {
+    // User doesn't have any disorders
+    console.log('You do not have any disorders.');
+  }
+
+  setQuizCompleted(true);
+};
 
   const currentIssue = quizBank.find((issue) => issue.issue === selectedIssue);
 
@@ -626,7 +642,9 @@ function QuizComponent() {
               Next
             </Button>
             {currentQuestionIndex === currentIssue.questions.length - 1 && (
-              <Button onClick={calculateQuizScore}>Finish Quiz</Button>
+              <Button onClick={calculateQuizScore}>
+                  <Link to='/dashboard'>Finish test</Link>
+              </Button>
             )}
           </Box>
         )}
