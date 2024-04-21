@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { db } from "./config";
 import {
   collection,
@@ -22,6 +22,15 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const messagesRef = collection(db, "messages");
   const name = localStorage.getItem("username");
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -82,6 +91,7 @@ const Chat = () => {
                 <Text fontSize="xl  ">{message.message}</Text>
               </Box>
             ))}
+            <div ref={messagesEndRef}/>
           </Box>
           <HStack spacing='0.01'>
             <Input

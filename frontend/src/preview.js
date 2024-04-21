@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from './config';
 import { collection, query, where, getDocs, setDoc, doc, limit, addDoc } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
+import {Button, Box} from '@chakra-ui/react';
 
 const Preview = () => {
   const [response, setResponse] = useState('');
@@ -55,18 +56,22 @@ const Preview = () => {
   }, [response]);
 
   return (
-    <div>
+    <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
       {response
        .replace('[', '') 
        .replace(']', '')
        .replace(/'/g, '') 
        .split(', ')       
        .map((community, index) => (
-    <div key={index}>
-      <Link to={`/chat?room=${community}`}>{community}</Link>
-    </div>
-  ))}
-    </div>
+        <Box key={index}>
+          <Link to={`/chat?room=${community}`}>
+            <Button m='1'>
+              {community} highway
+            </Button>
+          </Link>
+        </Box>
+      ))}
+    </Box>
   );
 };
 
