@@ -6,16 +6,15 @@ import QuizComponent from './quiz';
 
 const App = () => {
   return (
-    // <Router>
-    //   <div className="App">
-    //     <Routes>
-    //       <Route exact path="/" element={<Preview />} />
-    //       <Route path="/chat" element={<Chat />} />
-
-    //     </Routes>
-    //   </div>
-    // </Router>
-    <QuizComponent />
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route exact path="/" element={<Preview />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/quiz" element={<QuizComponent />}/>
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

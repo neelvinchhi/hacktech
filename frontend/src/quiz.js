@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Select, Button, Box, Text } from '@chakra-ui/react';
 import { db } from './config';
-import { collection, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, doc, setDoc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 
 function QuizComponent() {
 

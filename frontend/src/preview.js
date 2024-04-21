@@ -45,7 +45,7 @@ const Preview = () => {
             name: 'AI Bot',
             message: `Hello there! Welcome to the ${community} community. Please feel free to be open and converse with the people and me.`,
             community: community,
-            time: serverTimestamp()
+            // time: serverTimestamp()
           });
         }
       }

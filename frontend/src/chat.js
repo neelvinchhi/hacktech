@@ -15,6 +15,8 @@ import {
 
 import { Box, Input, Button, VStack, HStack, IconButton, Text, ChakraProvider } from '@chakra-ui/react';
 import { FaPaperPlane } from 'react-icons/fa';
+import OpenAI from "openai";
+
 
 const Chat = () => {
   const [room, setRoom] = useState('');
@@ -23,7 +25,32 @@ const Chat = () => {
   const messagesRef = collection(db, "messages");
   const name = localStorage.getItem("username");
   const messagesEndRef = useRef(null);
+  const openai = new OpenAI({apiKey : "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", dangerouslyAllowBrowser:true});
 
+
+  async function main(newMessage) {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: "Your name is RAJU and are now a convener of an online chatroom that is a support group of people suffering from"+ {room} + ". Reply in an empathetic manner in no more than 20 words to the following message."+ newMessage }],
+      stream: false,
+    });
+  
+    try {
+      const generatedText = completion['choices'][0]['message']['content'];
+      console.log(generatedText);
+      const newDoc = doc(messagesRef);
+      await setDoc(newDoc, {
+      community: room,
+      message: generatedText,
+      name: "RAJU",
+      time: serverTimestamp()});
+
+
+    } catch (error) {
+      console.error('Error:', error);
+      console.log(completion)
+    }
+  }
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -62,19 +89,33 @@ const Chat = () => {
     return () => unsubscribe();
   }, [room]);
 
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!newMessage.trim()) return;
 
     try {
-      const newDoc = doc(messagesRef);
-      await setDoc(newDoc, {
+      var words = newMessage.split(" ")
+      if (words.length > 0 && words[0].toUpperCase() === 'RAJU') {
+        main(newMessage.trim());
+        const newDoc = doc(messagesRef);
+        await setDoc(newDoc, {
         community: room,
         message: newMessage,
         name: name,
         time: serverTimestamp()
-      });
-      setNewMessage("");
+        });
+        setNewMessage("");
+      } else {
+        const newDoc = doc(messagesRef);
+        await setDoc(newDoc, {
+        community: room,
+        message: newMessage,
+        name: name,
+        time: serverTimestamp()
+        });
+        setNewMessage("");
+      }
     } catch (error) {
       console.error("Error adding message:", error);
     }
