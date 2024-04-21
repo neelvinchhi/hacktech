@@ -33,7 +33,7 @@ const GoogleAuth = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const name = user.email.replace('@gmail.com', '');
+      const name = user.displayName;
 
       const q = query(collection(db, 'users'), where('email', '==', user.email));
       const querySnapshot = await getDocs(q);
