@@ -1,65 +1,72 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { db } from '../config';
-import { collection, query, where, getDocs, setDoc, doc, limit } from 'firebase/firestore';
+import { db } from './config';
+import { collection, query, where, getDocs, setDoc, doc, limit, addDoc } from 'firebase/firestore';
 
 const Preview = () => {
-  const username = localStorage.getItem('username');
-  const [response, setResponse] = useState([]);
-  const [noCommunities, setNoCommunities] = useState(false);
+  const [response, setResponse] = useState('');
+  const username = localStorage.getItem("username");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const q = query(collection(db, 'users'), where('username', '==', username));
+        const q = query(collection(db, 'users'), where('name', '==', username));
         const querySnapshot = await getDocs(q);
 
-        let communities = ['adhd', 'autism', 'ocd']; // only for testing
+        let communities = '';
         querySnapshot.forEach((doc) => {
-          communities = doc.data().response || [];
+          communities = doc.data().response || '';
         });
-        
-        setResponse(communities);
 
-        if (communities.length === 0) {
-          setNoCommunities(true);
-        }
+        setResponse(communities);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
-  }, [username]);
+  }, []);
 
   useEffect(() => {
-    response.forEach(async (community) => {
-      const messageQuery = query(collection(db, 'messages'), where('community', '==', community), limit(1));
-      const messageSnapshot = await getDocs(messageQuery);
-      
-      if (messageSnapshot.empty) {
-        await setDoc(doc(db, 'messages'), {
-          name: 'AI Bot',
-          message: `Hello there! Welcome to the ${community} community. Please feel free to be open and converse with the people and me.`,
-          community: community
-        });
+    const fetchData = async () => {
+      const communitiesArray = response.split(',').map((community) => community.trim());
+    
+      for (let community of communitiesArray) {
+        community = community.replace('[', '');
+        community = community.replace(']', '');
+        community = community.replace(/'/g, '');
+        community = community.toLowerCase()
+        const messageQuery = query(collection(db, 'messages'), where('community', '==', community), limit(1));
+        const messageSnapshot = await getDocs(messageQuery);
+    
+        if (messageSnapshot.empty) {
+          await addDoc(collection(db, 'messages'), { 
+            name: 'AI Bot',
+            message: `Hello there! Welcome to the ${community} community. Please feel free to be open and converse with the people and me.`,
+            community: community
+          });
+        }
       }
-    });
-  }, [response]);
+    };
 
-  if (noCommunities) {
-    return <div>Sorry, you are not part of any group yet.</div>;
-  }
+    if (response) {
+      fetchData();
+    }
+  }, [response]);
 
   return (
     <div>
-      {/* Display community names as links */}
-      {response.map((community, index) => (
-        <div key={index}>
-          <a href={`/chat?=${community}`} target="_blank">{community}</a>
-        </div>
-      ))}
+      {response
+       .replace('[', '') 
+       .replace(']', '')
+       .replace(/'/g, '') 
+       .split(', ')       
+       .map((community, index) => (
+    <div key={index}>
+      <a href={`/chat?room=${community}`} target="_blank">{community}</a>
+    </div>
+  ))}
     </div>
   );
 };

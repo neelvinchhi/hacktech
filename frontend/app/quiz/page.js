@@ -15,7 +15,7 @@ const FormPage = () => {
   {
     id: 2,
     text: 'Which programming language do you prefer?',
-    options: ['JavaScript', 'Python', 'Java', 'C++'],
+    options: ['JavaScript', 'Python', 'Java', 'C++', 'Go'],
   },
   // Add more questions here
 ];

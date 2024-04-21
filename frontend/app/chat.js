@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from "./config";
+import { db } from "./dashboard/config";
 import {
   collection,
   query,
