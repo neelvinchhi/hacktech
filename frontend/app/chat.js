@@ -1,49 +1,74 @@
-import React, { useState, useEffect } from "react";
-import { db, app } from "./config.js";
+import React, { useEffect, useState } from "react";
+import { db } from "./config";
 import {
   collection,
-  addDoc,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+  limit,
   serverTimestamp,
   onSnapshot,
-  query,
   orderBy,
 } from "firebase/firestore";
 
-export const Chat = ({ room }) => {
-  const name = localStorage.getItem("username");
+const Chat = () => {
+  const [room, setRoom] = useState('');
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const messagesRef = collection(db, "messages");
+  const name = localStorage.getItem("username");
 
   useEffect(() => {
-    const q = query(
-      messagesRef,
-      where("community", "==", room),
-      orderBy("time")
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const messages = [];
-      snapshot.forEach((doc) => {
-        messages.push({ id: doc.id, ...doc.data() });
-      });
-      setMessages(messages);
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomParam = urlParams.get("room");
+    if (roomParam) {
+      setRoom(roomParam);
+    }
+  }, []);
 
-    return () => unsubscribe();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const q = query(
+          messagesRef,
+          where("community", "==", room),
+          orderBy("time")
+        );
+        const querySnapshot = await getDocs(q);
+        const messages = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log(messages)
+        setMessages(messages);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    if (room) {
+      fetchData();
+    }
   }, [room]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!newMessage.trim()) return;
 
-    if (newMessage === "") return;
-    await addDoc(messagesRef, {
-      community: room,
-      message: newMessage,
-      name: name,
-      time: serverTimestamp()
-    });
-
-    setNewMessage("");
+    try {
+      const newDoc = doc(messagesRef);
+      await setDoc(newDoc, {
+        community: room,
+        message: newMessage,
+        name: name,
+        time: serverTimestamp()
+      });
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error adding message:", error);
+    }
   };
 
   return (
@@ -53,10 +78,10 @@ export const Chat = ({ room }) => {
       </div>
       <div className="messages">
         {messages.map((message) => (
-          <div key={message.id} className="message">
-            <span className="user">Anonymous:</span> {message.message} - {message.time}
-          </div>
-        ))}
+        <div key={message.id}>
+          <p>{message.name}: {message.message}</p>
+        </div>
+      ))}
       </div>
       <form onSubmit={handleSubmit} className="new-message-form">
         <input
@@ -73,3 +98,5 @@ export const Chat = ({ room }) => {
     </div>
   );
 };
+
+export default Chat;
