@@ -13,6 +13,9 @@ import {
   orderBy,
 } from "firebase/firestore";
 
+import { Box, Input, Button, VStack, HStack, IconButton, Text, ChakraProvider } from '@chakra-ui/react';
+import { FaPaperPlane } from 'react-icons/fa';
+
 const Chat = () => {
   const [room, setRoom] = useState('');
   const [messages, setMessages] = useState([]);
@@ -68,31 +71,35 @@ const Chat = () => {
     }
   };
 
-  return (
-    <div className="chat-app">
-      <div className="header">
-        <h1>Welcome to: {room.toUpperCase()}</h1>
-      </div>
-      <div className="messages">
-        {messages.map((message) => (
-        <div key={message.id}>
-          <p>{message.name}: {message.message}</p>
-        </div>
-      ))}
-      </div>
-      <form onSubmit={handleSubmit} className="new-message-form">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(event) => setNewMessage(event.target.value)}
-          className="new-message-input"
-          placeholder="Type your message here..."
-        />
-        <button type="submit" className="send-button">
-          Send
-        </button>
-      </form>
-    </div>
+ return (
+    <Box className="chat-app" h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+      <Box p={4} w="1400px" h='93.5vh' borderWidth="1px" borderRadius="lg">
+        <VStack align="stretch" flex="1">
+          <Box h='85vh' overflowY="scroll">
+            {messages.map((message, index) => (
+              <Box key={index} bg="gray.700" p={2} borderRadius="md" margin={1}>
+                <Text fontSize="xs" fontWeight="bold">{message.name}</Text>
+                <Text fontSize="xl  ">{message.message}</Text>
+              </Box>
+            ))}
+          </Box>
+          <HStack spacing='0.01'>
+            <Input
+              placeholder="Type your message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <IconButton  
+              icon={<FaPaperPlane />}
+              onClick={handleSubmit}
+              colorScheme="blue"
+              aria-label="Send"
+              ml={2} 
+            />
+          </HStack>
+        </VStack>
+      </Box>
+    </Box>
   );
 };
 
