@@ -559,20 +559,28 @@ function QuizComponent() {
 
     if (totalScore > 18) {
       // User may have the disorder
-      const userDisorder = selectedIssue;
-      setUserDisorders([userDisorder]);
+      const newDisorder = selectedIssue;
       try {
         const userRef = doc(db, 'users', localStorage.getItem('username'));
-        await updateDoc(userRef, {
-          disorders: arrayUnion(userDisorder)
-        });
-        console.log(`Disorder ${userDisorder} added to user.`);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          const responseData = docSnap.data().response;
+          let responseArray = responseData ? JSON.parse(responseData) : [];
+          responseArray.push(newDisorder);
+          const updatedResponse = JSON.stringify(responseArray);
+          await updateDoc(userRef, {
+            response: updatedResponse
+          });
+          console.log(`Disorder ${newDisorder} added to user's response.`);
+          setUserDisorders(responseArray);
+        } else {
+          console.log('User document does not exist.');
+        }
       } catch (error) {
         console.error('Error updating document:', error);
       }
     } else {
       // User doesn't have any disorders
-      setUserDisorders([]);
       console.log('You do not have any disorders.');
     }
 
