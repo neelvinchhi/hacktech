@@ -44,7 +44,8 @@ const Preview = () => {
           await addDoc(collection(db, 'messages'), { 
             name: 'AI Bot',
             message: `Hello there! Welcome to the ${community} community. Please feel free to be open and converse with the people and me.`,
-            community: community
+            community: community,
+            time: serverTimestamp()
           });
         }
       }
@@ -54,6 +55,11 @@ const Preview = () => {
       fetchData();
     }
   }, [response]);
+
+
+  if (!response) {
+    return <div>You are not in any group at this point of time.</div>;
+  }
 
   return (
     <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
