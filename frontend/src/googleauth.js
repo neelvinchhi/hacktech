@@ -5,7 +5,6 @@ import { Box, Heading, Button, Text, ChakraProvider } from '@chakra-ui/react'
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs, setDoc, doc } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';  
 
 
 
@@ -25,7 +24,6 @@ const db = getFirestore(app);
 
 const GoogleAuth = () => {
   const [error, setError] = useState(null);
-  const router = useRouter();
 
   const handleSignInWithGoogle = async () => {
     try {
@@ -49,8 +47,7 @@ const GoogleAuth = () => {
         console.log('User added to Firestore:', user.uid);
       }
 
-      // Redirect to quiz upon successful authentication
-      router.push('/quiz');
+
     } catch (error) {
       console.error('Error signing in with Google:', error.message);
       setError('Error signing in with Google. Please try again.');

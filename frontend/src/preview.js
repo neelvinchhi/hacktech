@@ -1,9 +1,7 @@
-'use client'
-
 import React, { useEffect, useState } from 'react';
 import { db } from './config';
 import { collection, query, where, getDocs, setDoc, doc, limit, addDoc } from 'firebase/firestore';
-import  { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 const Preview = () => {
   const [response, setResponse] = useState('');
@@ -19,7 +17,7 @@ const Preview = () => {
         querySnapshot.forEach((doc) => {
           communities = doc.data().response || '';
         });
-        console.log(communities);
+
         setResponse(communities);
       } catch (error) {
         console.error('Error fetching data:', error);

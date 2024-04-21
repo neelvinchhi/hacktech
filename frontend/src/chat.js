@@ -29,28 +29,25 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const q = query(
-          messagesRef,
-          where("community", "==", room),
-          orderBy("time")
-        );
-        const querySnapshot = await getDocs(q);
-        const messages = querySnapshot.docs.map((doc) => ({
+    const unsubscribe = onSnapshot(
+      query(
+        messagesRef,
+        where("community", "==", room),
+        orderBy("time", "asc")
+      ),
+      (snapshot) => {
+        const messages = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(messages)
         setMessages(messages);
-      } catch (error) {
+      },
+      (error) => {
         console.error("Error fetching messages:", error);
       }
-    };
-
-    if (room) {
-      fetchData();
-    }
+    );
+  
+    return () => unsubscribe();
   }, [room]);
 
   const handleSubmit = async (event) => {
