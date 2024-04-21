@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Select, Button, Box, Text } from '@chakra-ui/react';
+import { db } from './config';
+import { collection, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 
 function QuizComponent() {
 
@@ -514,14 +516,16 @@ function QuizComponent() {
   const [selectedIssue, setSelectedIssue] = useState('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [quizScore, setQuizScore] = useState(null);
+  const [userDisorders, setUserDisorders] = useState([]);
+  const [quizCompleted, setQuizCompleted] = useState(false);
 
   const handleIssueChange = (event) => {
     const selectedValue = event.target.value;
     setSelectedIssue(selectedValue);
     setCurrentQuestionIndex(0);
     setAnswers({});
-    setQuizScore(null);
+    setUserDisorders([]);
+    setQuizCompleted(false);
   };
 
   const handleNext = () => {
@@ -540,7 +544,7 @@ function QuizComponent() {
     }));
   };
 
-  const calculateQuizScore = () => {
+  const calculateQuizScore = async () => {
     let totalScore = 0;
 
     quizBank.forEach((issue) => {
@@ -553,7 +557,26 @@ function QuizComponent() {
       }
     });
 
-    setQuizScore(totalScore);
+    if (totalScore > 18) {
+      // User may have the disorder
+      const userDisorder = selectedIssue;
+      setUserDisorders([userDisorder]);
+      try {
+        const userRef = doc(db, 'users', localStorage.getItem('username'));
+        await updateDoc(userRef, {
+          disorders: arrayUnion(userDisorder)
+        });
+        console.log(`Disorder ${userDisorder} added to user.`);
+      } catch (error) {
+        console.error('Error updating document:', error);
+      }
+    } else {
+      // User doesn't have any disorders
+      setUserDisorders([]);
+      console.log('You do not have any disorders.');
+    }
+
+    setQuizCompleted(true);
   };
 
   const currentIssue = quizBank.find((issue) => issue.issue === selectedIssue);
@@ -561,48 +584,52 @@ function QuizComponent() {
   return (
     <Box h="100vh" bg="gray.800" color="white" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
       <Box p={4} w="1400px" borderWidth="1px" borderRadius="lg">
-      <Select value={selectedIssue} onChange={handleIssueChange} placeholder="Select Disorder" mb={4}>
-        {quizBank.map((issue) => (
-          <option key={issue.issue} value={issue.issue}>
-            {issue.issue}
-          </option>
-        ))}
-      </Select>
-      {selectedIssue && (
-        <Box >
-          <Text>{currentIssue.questions[currentQuestionIndex].text}</Text>
-          {currentIssue.questions[currentQuestionIndex].options.map((option, index) => (
-            <div key={option}>
-              <input
-                type="radio"
-                id={`${option}-${index}`}
-                name="answer"
-                value={option}
-                checked={answers[currentQuestionIndex + 1] === option}
-                onChange={handleAnswerSelect}
-              />
-              <label htmlFor={`${option}-${index}`}>{option}</label>
-            </div>
+        <Select value={selectedIssue} onChange={handleIssueChange} placeholder="Select Disorder" mb={4}>
+          {quizBank.map((issue) => (
+            <option key={issue.issue} value={issue.issue}>
+              {issue.issue}
+            </option>
           ))}
-          <Button onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
-            Previous
-          </Button>
-          <Button onClick={handleNext} disabled={currentQuestionIndex === currentIssue.questions.length - 1} m='5'>
-            Next
-          </Button>
-          {currentQuestionIndex === currentIssue.questions.length - 1 && (
-            <Button onClick={calculateQuizScore}>Calculate Score</Button>
-          )}
-        </Box>
-      )}
-      {quizScore !== null && (
-        <Box>
-          <Text>Your quiz score: {quizScore}</Text>
-        </Box>
-      )}
+        </Select>
+        {selectedIssue && (
+          <Box>
+            <Text>{currentIssue.questions[currentQuestionIndex].text}</Text>
+            {currentIssue.questions[currentQuestionIndex].options.map((option, index) => (
+              <div key={option}>
+                <input
+                  type="radio"
+                  id={`${option}-${index}`}
+                  name="answer"
+                  value={option}
+                  checked={answers[currentQuestionIndex + 1] === option}
+                  onChange={handleAnswerSelect}
+                />
+                <label htmlFor={`${option}-${index}`}>{option}</label>
+              </div>
+            ))}
+            <Button onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
+              Previous
+            </Button>
+            <Button onClick={handleNext} disabled={currentQuestionIndex === currentIssue.questions.length - 1} m='5'>
+              Next
+            </Button>
+            {currentQuestionIndex === currentIssue.questions.length - 1 && (
+              <Button onClick={calculateQuizScore}>Finish Quiz</Button>
+            )}
+          </Box>
+        )}
+        {quizCompleted && (
+          <Box>
+            {userDisorders.length > 0 ? (
+              <Text>You have: {userDisorders.join(', ')}</Text>
+            ) : (
+              <Text>You do not have any disorders.</Text>
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );
-}
+};
 
 export default QuizComponent;
