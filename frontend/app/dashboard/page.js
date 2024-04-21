@@ -64,7 +64,7 @@ const Preview = () => {
        .split(', ')       
        .map((community, index) => (
     <div key={index}>
-      <a href={`/chat?room=${community}`} target="_blank">{community}</a>
+      <Link to={`/chat?room=${community}`}>{community}</Link>
     </div>
   ))}
     </div>
