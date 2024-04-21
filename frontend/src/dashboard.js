@@ -19,7 +19,7 @@ const Preview = () => {
         querySnapshot.forEach((doc) => {
           communities = doc.data().response || '';
         });
-
+        console.log(communities);
         setResponse(communities);
       } catch (error) {
         console.error('Error fetching data:', error);
